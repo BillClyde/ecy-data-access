@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ECY.DataAccess
 {
-    public class UnitOfWork
+    public class UnitOfWork : IDisposable
     {
         private IDbTransaction _transaction;
         private readonly Action<UnitOfWork> _onCommit;

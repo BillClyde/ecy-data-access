@@ -47,7 +47,6 @@ namespace ECY.DataAccess
         {
             if (!disposed)
             {
-                _unitOfWork.Save();
                 if (!disposing)
                 {
                     _unitOfWork.Dispose();

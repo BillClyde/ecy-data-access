@@ -27,7 +27,7 @@ namespace DataAccessExample
             //Session needs to have the connection name passed to it.
             container.Register<ISession>(() => new Session("AppConnection"), Lifestyle.Scoped);
             container.Register<IDatabase, Database>();
-            container.Register<IService, Service>();
+            container.Register<IAddressService, AddressService>();
 
             try
             {
@@ -47,65 +47,30 @@ namespace DataAccessExample
                 // In web applications you wouldn't do this you would use the Controller's constructor to get the service instance
                 // In either case the session automatically wraps the database actions in a transaction, any changes are saved
                 // to the database when the scope ends.
-                var service = container.GetInstance<IService>();
+                var service = container.GetInstance<IAddressService>();
+                var session = container.GetInstance<ISession>();
 
-                foreach (var item in service.GetLogins())
+                service.InsertAddress(new Address {
+                    Address1 = "134 Main Street",
+                    City = "Olympia",
+                    State = "WA",
+                    PostalCode = "98516"
+                });
+
+                foreach (var item in service.GetAddresses())
                 {
                     Console.WriteLine(item);
                 }
+                Console.WriteLine("Save Entry? (y/N)");
+                var keyPressed = Console.ReadKey();
+                var yesKey = new string[] { "Y", "y" };
+                if (keyPressed.Key.ToString() == "Y")
+                {
+                    session.Save();
+                }
             }
-
             Console.WriteLine("Done.");
             Console.ReadKey();
-        }
-    }
-
-    public interface IService
-    {
-        IEnumerable<string> GetLogins();
-    }
-
-    /// <summary>
-    /// Example of a service that calls the database stored procs
-    /// </summary>
-    public class Service : IService
-    {
-        private readonly IDatabase _database;
-
-        /// <summary>
-        /// This captures the injected instance variables.
-        /// </summary>
-        /// <param name="database">The injected database instance</param>
-        public Service(IDatabase database)
-        {
-            _database = database;
-        }
-
-        /// <summary>
-        /// Sample call to a database instance
-        /// </summary>
-        /// <returns>The results of the query</returns>
-        public IEnumerable<string> GetLogins()
-        {
-            return _database.Query(new GetLogins());
-        }
-    }
-
-    /// <summary>
-    /// Example of a query using the CQRS pattern
-    /// </summary>
-    public class GetLogins : IQuery<IEnumerable<string>>
-    {
-        public IEnumerable<string> Execute(ISession session)
-        {
-            var list = new List<string>();
-            var result = session.Query("spExtraLoginsGetLogins");
-            foreach (DataRow row in result.Rows)
-            {
-                list.Add(row.Field<string>(1));
-            }
-
-            return list;
         }
     }
 }

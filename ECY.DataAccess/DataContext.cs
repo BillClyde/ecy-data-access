@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace ECY.DataAccess
 {
-    public class DataContext
+    public class DataContext : IDisposable
     {
         private IDbConnection _connection;
         private readonly DbConnectionFactory _connectionFactory;
@@ -95,7 +95,7 @@ namespace ECY.DataAccess
                     object val = prop.GetValue(parameters, null);
                     var p = cmd.CreateParameter();
                     p.ParameterName = "@" + prop.Name;
-                    if (val.GetType() == typeof(ParameterDirection) && (ParameterDirection)val == ParameterDirection.Output)
+                    if (val != null && val.GetType() == typeof(ParameterDirection) && (ParameterDirection)val == ParameterDirection.Output)
                     {
                         p.Direction = ParameterDirection.Output;
                         p.DbType = DbType.String;

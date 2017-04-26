@@ -8,6 +8,7 @@ namespace ECY.DataAccess.Interfaces
     {
         IEnumerable<T> Query<T>(string query, object param = null, CommandType commandType = CommandType.StoredProcedure) where T : class, IEntity<T>, new();
         DataTable Query(string query, object param = null, CommandType commandType = CommandType.StoredProcedure);
+        void Save();
         object Execute(string query, object param = null);
     }
 }
