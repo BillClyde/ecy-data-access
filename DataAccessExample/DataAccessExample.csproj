@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="Address.cs" />
     <Compile Include="AddressService.cs" />
+    <Compile Include="DeleteAddress.cs" />
     <Compile Include="GetAddresses.cs" />
     <Compile Include="InsertAddress.cs" />
     <Compile Include="Program.cs" />

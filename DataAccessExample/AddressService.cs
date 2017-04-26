@@ -25,22 +25,22 @@ namespace DataAccessExample
 
         public void DeleteAddress(int Id)
         {
-            throw new NotImplementedException();
+            _database.Execute(new DeleteAddress(Id));
         }
 
         public IEnumerable<Address> GetAddresses()
         {
-            throw new NotImplementedException();
+            return _database.Query(new GetAddresses());
         }
 
         public void InsertAddress(Address address)
         {
-            throw new NotImplementedException();
+            _database.Execute(new InsertAddress(address));
         }
 
         public void UpdateAddress(Address address)
         {
-            throw new NotImplementedException();
+            _database.Execute(new UpdateAddress(address));
         }
     }
 }
