@@ -25,4 +25,16 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 3
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = http://ecytfs:8080/tfs/fass%20collection
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = ECY.DataAccess\\ECY.DataAccess.csproj
+		SccProjectName1 = ECY.DataAccess
+		SccLocalPath1 = ECY.DataAccess
+		SccProjectUniqueName2 = DataAccessExample\\DataAccessExample.csproj
+		SccProjectName2 = DataAccessExample
+		SccLocalPath2 = DataAccessExample
+	EndGlobalSection
 EndGlobal

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package >
+<package>
   <metadata>
     <id>$id$</id>
     <version>$version$</version>
@@ -8,7 +8,7 @@
     <owners>$author$</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Initial Release</releaseNotes>
+    <releaseNotes>Session.Save is no longer implicit.</releaseNotes>
     <copyright>Copyright 2017</copyright>
     <tags>database datacontext unitofwork cqrs</tags>
   </metadata>
