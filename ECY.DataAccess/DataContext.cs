@@ -58,17 +58,26 @@ namespace ECY.DataAccess
         {
             DataTable table;
             CreateOrReuseConnection();
+            bool wasClosed = _connection.State == ConnectionState.Closed;
+            if (wasClosed) _connection.Open();
             using (IDbCommand cmd = _connection.CreateCommand())
             {
-                cmd.CommandText = sp;
-                AddInputParameters(cmd, param);
-                cmd.CommandType = commandType;
-                cmd.Transaction = GetCurrentTransaction();
-                using (IDataReader reader = cmd.ExecuteReader())
+                try
                 {
-                    table = new DataTable();
-                    table.Load(reader);
-                    return table;
+                    cmd.CommandText = sp;
+                    AddInputParameters(cmd, param);
+                    cmd.CommandType = commandType;
+                    cmd.Transaction = GetCurrentTransaction();
+                    using (IDataReader reader = cmd.ExecuteReader())
+                    {
+                        table = new DataTable();
+                        table.Load(reader);
+                        return table;
+                    }
+                }
+                finally
+                {
+                    if (wasClosed) _connection.Close();
                 }
             }
         }
@@ -76,14 +85,24 @@ namespace ECY.DataAccess
         public object Execute(string sp, object param) 
         {
             CreateOrReuseConnection();
-            using (IDbCommand cmd = _connection.CreateCommand())
+            bool wasClosed = _connection.State == ConnectionState.Closed;
+            if (wasClosed) _connection.Open();
+            try
             {
-                cmd.CommandText = sp;
-                AddInputParameters(cmd, param);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Transaction = GetCurrentTransaction();
-                return cmd.ExecuteScalar();
-            };
+                using (IDbCommand cmd = _connection.CreateCommand())
+                {
+                    cmd.CommandText = sp;
+                    AddInputParameters(cmd, param);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Transaction = GetCurrentTransaction();
+                    return cmd.ExecuteScalar();
+                }
+
+            }
+            finally
+            {
+                if (wasClosed) _connection.Close();
+            }
         }
 
         private void AddInputParameters<T>(IDbCommand cmd, T parameters) where T : class

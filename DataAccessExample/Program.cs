@@ -68,7 +68,13 @@ namespace DataAccessExample
                 {
                     session.Save();
                 }
+
+                foreach (var item in service.GetAddresses())
+                {
+                    Console.WriteLine(item);
+                }
             }
+
             Console.WriteLine("Done.");
             Console.ReadKey();
         }

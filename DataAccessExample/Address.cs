@@ -34,5 +34,10 @@ namespace DataAccessExample
 
             return l;
         }
+
+        public override string ToString()
+        {
+            return string.Format(@"{0}, {1}, {2} {3}", Address1, City, State, PostalCode);
+        }
     }
 }
