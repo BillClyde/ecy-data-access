@@ -2,11 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using NLog;
 
 namespace ECY.DataAccess
 {
     public class Session : ISession, IDisposable
     {
+        private readonly Logger log = LogManager.GetCurrentClassLogger();
         private readonly DataContext _context;
         private readonly UnitOfWork _unitOfWork;
         private bool disposed;
@@ -45,10 +47,12 @@ namespace ECY.DataAccess
 
         private void Dispose(bool disposing)
         {
+            log.Debug("Disposing session with {0}", disposing);
             if (!disposed)
             {
-                if (!disposing)
+                if (disposing)
                 {
+                    log.Debug("Disposing unitofwork and context");
                     _unitOfWork.Dispose();
                     _context.Dispose();
                 }

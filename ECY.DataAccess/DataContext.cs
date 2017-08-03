@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading;
+using NLog;
 
 namespace ECY.DataAccess
 {
     public class DataContext : IDisposable
     {
+        private readonly Logger log = LogManager.GetCurrentClassLogger();
         private IDbConnection _connection;
         private readonly DbConnectionFactory _connectionFactory;
         private readonly ReaderWriterLockSlim _rwLock = new ReaderWriterLockSlim();
@@ -23,7 +25,11 @@ namespace ECY.DataAccess
             CreateOrReuseConnection();
 
             bool wasClosed = _connection.State == ConnectionState.Closed;
-            if (wasClosed) _connection.Open();
+            if (wasClosed)
+            {
+                log.Debug("Opening db connection which is {0}", _connection.State == ConnectionState.Closed ? "Closed" : "Open");
+                _connection.Open();
+            }
 
             try
             {
@@ -59,7 +65,11 @@ namespace ECY.DataAccess
             DataTable table;
             CreateOrReuseConnection();
             bool wasClosed = _connection.State == ConnectionState.Closed;
-            if (wasClosed) _connection.Open();
+            if (wasClosed)
+            {
+                log.Debug("Opening db connection which is {0}", _connection.State == ConnectionState.Closed ? "Closed" : "Open");
+                _connection.Open();
+            }
             using (IDbCommand cmd = _connection.CreateCommand())
             {
                 try
@@ -86,7 +96,11 @@ namespace ECY.DataAccess
         {
             CreateOrReuseConnection();
             bool wasClosed = _connection.State == ConnectionState.Closed;
-            if (wasClosed) _connection.Open();
+            if (wasClosed)
+            {
+                log.Debug("Opening db connection which is {0}", _connection.State == ConnectionState.Closed ? "Closed" : "Open");
+                _connection.Open();
+            }
             try
             {
                 using (IDbCommand cmd = _connection.CreateCommand())
@@ -149,7 +163,11 @@ namespace ECY.DataAccess
             _workItems.Remove(workItem);
             _rwLock.ExitWriteLock();
 
-            _connection.Close();
+            if (_connection.State == ConnectionState.Open)
+            {
+                log.Debug("Closing db connection which is {0}", _connection.State == ConnectionState.Closed ? "Closed" : "Open");
+                _connection.Close();
+            }
         }
 
         private IDbTransaction GetCurrentTransaction()
@@ -164,6 +182,7 @@ namespace ECY.DataAccess
 
         public void Dispose()
         {
+            log.Debug("Data context being disposed");
             _rwLock.EnterUpgradeableReadLock();
             try
             {
@@ -180,7 +199,10 @@ namespace ECY.DataAccess
 
             if(_connection != null)
             {
-                _connection.Dispose();
+                if(_connection.State == ConnectionState.Open) {
+                    log.Debug("Closing db connection which is {0}", _connection.State == ConnectionState.Closed ? "Closed" : "Open");
+                    _connection.Dispose();
+                }
                 _connection = null;
             }
         }

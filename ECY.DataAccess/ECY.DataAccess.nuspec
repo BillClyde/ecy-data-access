@@ -8,7 +8,7 @@
     <owners>$author$</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Session.Save is no longer implicit.</releaseNotes>
+    <releaseNotes>Fixed problem were connections were not being disposed of.</releaseNotes>
     <copyright>Copyright 2017</copyright>
     <tags>database datacontext unitofwork cqrs</tags>
   </metadata>
