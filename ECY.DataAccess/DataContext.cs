@@ -54,13 +54,13 @@ namespace ECY.DataAccess
             }
         }
 
-        public IEnumerable<T> Query<T>(string sp, object param, CommandType commandType) where T : class, IEntity<T>, new()
+        public IEnumerable<T> Query<T>(string sp, object param, CommandType commandType, Action<IDbCommand> parseInputParams = null) where T : class, IEntity<T>, new()
         {
-            DataTable table = Query(sp, param, commandType);
+            DataTable table = Query(sp, param, commandType, parseInputParams);
             return new T().Mapper(table);
         }
 
-        public DataTable Query(string sp, object param, CommandType commandType)
+        public DataTable Query(string sp, object param, CommandType commandType, Action<IDbCommand> parseInputParams = null)
         {
             DataTable table;
             CreateOrReuseConnection();
@@ -75,7 +75,14 @@ namespace ECY.DataAccess
                 try
                 {
                     cmd.CommandText = sp;
-                    AddInputParameters(cmd, param);
+                    if(parseInputParams == null)
+                    {
+                        AddInputParameters(cmd, param);
+                    }
+                    else
+                    {
+                        parseInputParams(cmd);
+                    }
                     cmd.CommandType = commandType;
                     cmd.Transaction = GetCurrentTransaction();
                     using (IDataReader reader = cmd.ExecuteReader())
@@ -92,7 +99,7 @@ namespace ECY.DataAccess
             }
         }
 
-        public object Execute(string sp, object param) 
+        public object Execute(string sp, object param, Action<IDbCommand> parseInputParams = null) 
         {
             CreateOrReuseConnection();
             bool wasClosed = _connection.State == ConnectionState.Closed;
@@ -106,7 +113,14 @@ namespace ECY.DataAccess
                 using (IDbCommand cmd = _connection.CreateCommand())
                 {
                     cmd.CommandText = sp;
-                    AddInputParameters(cmd, param);
+                    if(parseInputParams == null)
+                    {
+                        AddInputParameters(cmd, param);
+                    }
+                    else
+                    {
+                        parseInputParams(cmd);
+                    }
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Transaction = GetCurrentTransaction();
                     return cmd.ExecuteScalar();

@@ -8,7 +8,7 @@
     <owners>$author$</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Fixed problem were connections were not being disposed of.</releaseNotes>
+    <releaseNotes>Package updates, NLog will no longer try to overwrite your config file.</releaseNotes>
     <copyright>Copyright 2017</copyright>
     <tags>database datacontext unitofwork cqrs</tags>
   </metadata>
