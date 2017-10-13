@@ -35,9 +35,9 @@ namespace ECY.DataAccess
         /// <param name="commandType">Defaults to stored procedure</param>
         /// <param name="parseInputParams">Alternate way of parsing SQL parameters if param object can't be used</param>
         /// <returns>Enumberable of type IEntity with the results of the query</returns>
-        public virtual IEnumerable<T> Query<T>(string query, object param = null, CommandType commandType = CommandType.StoredProcedure, Action<IDbCommand> parseInputParams = null) where T : class, IEntity<T>, new()
+        public virtual IEnumerable<T> Query<T>(string query, object param = null, CommandType commandType = CommandType.StoredProcedure, Action<IDbCommand> parseInputParams = null, int timeout = 15) where T : class, IEntity<T>, new()
         {
-            return _context.Query<T>(query, param, commandType, parseInputParams);
+            return _context.Query<T>(query, param, commandType, parseInputParams, timeout);
         }
 
         /// <summary>
@@ -48,9 +48,9 @@ namespace ECY.DataAccess
         /// <param name="commandType">Defaults to stored procedure</param>
         /// <param name="parseInputParams">Alternate way of parsing SQL parameters if param object can't be used</param>
         /// <returns>DataTable with the results of the query</returns>
-        public virtual DataTable Query(string query, object param = null, CommandType commandType = CommandType.StoredProcedure, Action<IDbCommand> parseInputParams = null)
+        public virtual DataTable Query(string query, object param = null, CommandType commandType = CommandType.StoredProcedure, Action<IDbCommand> parseInputParams = null, int timeout = 15)
         {
-            return _context.Query(query, param, commandType, parseInputParams);
+            return _context.Query(query, param, commandType, parseInputParams, timeout);
         }
 
         /// <summary>
@@ -60,9 +60,9 @@ namespace ECY.DataAccess
         /// <param name="param">Object containing parameters that correspond to the SQL parameters</param>
         /// <param name="parseInputParams">Alternate way of parsing SQL parameters if param object can't be used</param>
         /// <returns>Result of the stored proc</returns>
-        public object Execute(string sql, object param = null, Action<IDbCommand> parseInputParams = null)
+        public object Execute(string sql, object param = null, Action<IDbCommand> parseInputParams = null, int timeout = 15)
         {
-            return _context.Execute(sql, param, parseInputParams);
+            return _context.Execute(sql, param, parseInputParams, timeout);
         }
 
         /// <summary>

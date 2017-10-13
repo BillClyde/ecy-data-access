@@ -8,7 +8,7 @@
     <owners>$author$</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Package updates, NLog will no longer try to overwrite your config file.</releaseNotes>
+    <releaseNotes>Added a timeout parameter that defaults to 15 seconds</releaseNotes>
     <copyright>Copyright 2017</copyright>
     <tags>database datacontext unitofwork cqrs</tags>
   </metadata>

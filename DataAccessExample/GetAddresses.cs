@@ -11,7 +11,7 @@ namespace DataAccessExample
     {
         public IEnumerable<Address> Execute(ISession session)
         {
-            return session.Query<Address>("SELECT * FROM Address", commandType: System.Data.CommandType.Text);
+            return session.Query<Address>("SELECT * FROM Address", commandType: System.Data.CommandType.Text, timeout: 0);
         }
     }
 }
