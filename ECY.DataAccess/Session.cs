@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using NLog;
+using Common.Logging;
 
 namespace ECY.DataAccess
 {
@@ -11,7 +11,7 @@ namespace ECY.DataAccess
     /// </summary>
     public class Session : ISession, IDisposable
     {
-        private readonly Logger log = LogManager.GetCurrentClassLogger();
+        private readonly ILog log = LogManager.GetLogger<Session>();
         private readonly DataContext _context;
         private readonly UnitOfWork _unitOfWork;
         private bool disposed;
@@ -81,7 +81,7 @@ namespace ECY.DataAccess
 
         private void Dispose(bool disposing)
         {
-            log.Debug("Disposing session with {0}", disposing);
+            log.DebugFormat("Disposing session with {0}", disposing);
             if (!disposed)
             {
                 if (disposing)

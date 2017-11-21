@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading;
-using NLog;
+using Common.Logging;
 
 namespace ECY.DataAccess
 {
     public class DataContext : IDisposable
     {
-        private readonly Logger log = LogManager.GetCurrentClassLogger();
+        private readonly ILog log = LogManager.GetLogger<DataContext>();
         private IDbConnection _connection;
         private readonly DbConnectionFactory _connectionFactory;
         private readonly ReaderWriterLockSlim _rwLock = new ReaderWriterLockSlim();
@@ -27,7 +27,7 @@ namespace ECY.DataAccess
             bool wasClosed = _connection.State == ConnectionState.Closed;
             if (wasClosed)
             {
-                log.Debug("Opening db connection which is {0}", _connection.State == ConnectionState.Closed ? "Closed" : "Open");
+                log.DebugFormat("Opening db connection which is {0}", _connection.State == ConnectionState.Closed ? "Closed" : "Open");
                 _connection.Open();
             }
 
@@ -67,7 +67,7 @@ namespace ECY.DataAccess
             bool wasClosed = _connection.State == ConnectionState.Closed;
             if (wasClosed)
             {
-                log.Debug("Opening db connection which is {0}", _connection.State == ConnectionState.Closed ? "Closed" : "Open");
+                log.DebugFormat("Opening db connection which is {0}", _connection.State == ConnectionState.Closed ? "Closed" : "Open");
                 _connection.Open();
             }
             using (IDbCommand cmd = _connection.CreateCommand())
@@ -106,7 +106,7 @@ namespace ECY.DataAccess
             bool wasClosed = _connection.State == ConnectionState.Closed;
             if (wasClosed)
             {
-                log.Debug("Opening db connection which is {0}", _connection.State == ConnectionState.Closed ? "Closed" : "Open");
+                log.DebugFormat("Opening db connection which is {0}", _connection.State == ConnectionState.Closed ? "Closed" : "Open");
                 _connection.Open();
             }
             try
@@ -181,7 +181,7 @@ namespace ECY.DataAccess
 
             if (_connection.State == ConnectionState.Open)
             {
-                log.Debug("Closing db connection which is {0}", _connection.State == ConnectionState.Closed ? "Closed" : "Open");
+                log.DebugFormat("Closing db connection which is {0}", _connection.State == ConnectionState.Closed ? "Closed" : "Open");
                 _connection.Close();
             }
         }
@@ -216,7 +216,7 @@ namespace ECY.DataAccess
             if(_connection != null)
             {
                 if(_connection.State == ConnectionState.Open) {
-                    log.Debug("Closing db connection which is {0}", _connection.State == ConnectionState.Closed ? "Closed" : "Open");
+                    log.DebugFormat("Closing db connection which is {0}", _connection.State == ConnectionState.Closed ? "Closed" : "Open");
                     _connection.Dispose();
                 }
                 _connection = null;
