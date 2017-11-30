@@ -7,7 +7,7 @@ using ECY.DataAccess.Interfaces;
 
 namespace ECY.DataAccess
 {
-    class DefaultCommandHandler : ICommandHandler
+    public class DefaultCommandHandler : ICommandHandler
     {
         private readonly ISession _session;
 
