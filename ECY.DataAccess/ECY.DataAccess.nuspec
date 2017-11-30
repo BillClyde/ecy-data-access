@@ -8,7 +8,7 @@
     <owners>$author$</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <releaseNotes>Added a timeout parameter that defaults to 15 seconds</releaseNotes>
+    <releaseNotes>Changed logging to Common.Logging</releaseNotes>
     <copyright>Copyright 2017</copyright>
     <tags>database datacontext unitofwork cqrs</tags>
   </metadata>
