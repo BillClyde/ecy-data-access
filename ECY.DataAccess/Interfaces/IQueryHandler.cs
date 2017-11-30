@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ECY.DataAccess.Interfaces
 {
-    interface IQueryHandler
+    public interface IQueryHandler
     {
         T Query<T>(IQuery<T> query);
     }
