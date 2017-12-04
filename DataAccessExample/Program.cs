@@ -4,6 +4,7 @@ using SimpleInjector;
 using SimpleInjector.Lifestyles;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Data;
 
 namespace DataAccessExample
@@ -25,9 +26,11 @@ namespace DataAccessExample
             container.Options.DefaultScopedLifestyle = new ThreadScopedLifestyle();
 
             //Session needs to have the connection name passed to it.
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies().Where(x => x.FullName.Contains("DataAccessExample")).FirstOrDefault();
             container.Register<ISession>(() => new Session("AppConnection"), Lifestyle.Scoped);
-            container.Register<IDatabase, Database>();
-            container.Register<IAddressService, AddressService>();
+            container.Register(typeof(IQueryHandler<,>), new[] { assemblies });
+            container.Register(typeof(ICommandHandler<>), new[] { assemblies });
+            //container.Register<IAddressService, AddressService>();
 
             try
             {
@@ -47,17 +50,19 @@ namespace DataAccessExample
                 // In web applications you wouldn't do this you would use the Controller's constructor to get the service instance
                 // In either case the session automatically wraps the database actions in a transaction, any changes are saved
                 // to the database when the scope ends.
-                var service = container.GetInstance<IAddressService>();
+                //var service = container.GetInstance<IAddressService>();
                 var session = container.GetInstance<ISession>();
+                var getHandler = container.GetInstance<IQueryHandler<GetAddresses,IEnumerable<Address>>>();
+                var insertHandler = container.GetInstance<ICommandHandler<InsertAddress>>();
 
-                service.InsertAddress(new Address {
+                insertHandler.Execute(new InsertAddress(new Address {
                     Address1 = "134 Main Street",
                     City = "Olympia",
                     State = "WA",
                     PostalCode = "98516"
-                });
+                }));
 
-                foreach (var item in service.GetAddresses())
+                foreach (var item in getHandler.Query(new GetAddresses()))
                 {
                     Console.WriteLine(item);
                 }
@@ -69,7 +74,7 @@ namespace DataAccessExample
                     session.Save();
                 }
 
-                foreach (var item in service.GetAddresses())
+                foreach (var item in getHandler.Query(new GetAddresses()))
                 {
                     Console.WriteLine(item);
                 }

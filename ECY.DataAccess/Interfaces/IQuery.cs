@@ -1,7 +1,7 @@
 ﻿namespace ECY.DataAccess.Interfaces
 {
-    public interface IQuery<out T>
+    public interface IQuery<out TResult>
     {
-        T Execute(ISession session);
+        TResult Execute(ISession session);
     }
 }

@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace ECY.DataAccess.Interfaces
 {
-    public interface ICommandHandler
+    public interface ICommandHandler<TCommand>
     {
-        object Execute(ICommand command);
+        object Execute(TCommand command);
     }
 }

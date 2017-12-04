@@ -54,8 +54,6 @@
     <Compile Include="Database.cs" />
     <Compile Include="DataContext.cs" />
     <Compile Include="DbConnectionFactory.cs" />
-    <Compile Include="DefaultCommandHandler.cs" />
-    <Compile Include="DefaultQueryHandler.cs" />
     <Compile Include="Interfaces\ICommand.cs" />
     <Compile Include="Interfaces\ICommandHandler.cs" />
     <Compile Include="Interfaces\IDatabase.cs" />

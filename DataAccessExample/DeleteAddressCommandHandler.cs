@@ -5,21 +5,20 @@ using System.Text;
 using System.Threading.Tasks;
 using ECY.DataAccess.Interfaces;
 
-namespace ECY.DataAccess
+namespace DataAccessExample
 {
-    public class DefaultQueryHandler : IQueryHandler
+    public class DeleteAddressCommandHandler : ICommandHandler<DeleteAddress>
     {
         private ISession _session;
 
-        public DefaultQueryHandler(ISession session)
+        public DeleteAddressCommandHandler(ISession session)
         {
             _session = session;
         }
 
-        public T Query<T>(IQuery<T> query)
+        public object Execute(DeleteAddress command)
         {
-            var result = query.Execute(_session);
-            return result;
+            return command.Execute(_session);
         }
     }
 }
