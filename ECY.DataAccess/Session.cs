@@ -12,8 +12,8 @@ namespace ECY.DataAccess
     public class Session : ISession, IDisposable
     {
         private readonly ILog log = LogManager.GetLogger<Session>();
-        private readonly DataContext _context;
-        private readonly UnitOfWork _unitOfWork;
+        private DataContext _context;
+        private UnitOfWork _unitOfWork;
         private bool disposed;
 
         /// <summary>
@@ -23,6 +23,12 @@ namespace ECY.DataAccess
         public Session(string connectionStringName)
         {
             _context = new DataContext(connectionStringName);
+            _unitOfWork = _context.CreateUnitOfWork();
+        }
+
+        public void New(string connectionName)
+        {
+            _context = new DataContext(connectionName);
             _unitOfWork = _context.CreateUnitOfWork();
         }
 
