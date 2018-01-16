@@ -5,12 +5,19 @@ using System.Data.Common;
 
 namespace ECY.DataAccess
 {
+    /// <summary>
+    /// Factory for creating database connections
+    /// </summary>
     public class DbConnectionFactory
     {
         private readonly DbProviderFactory provider;
         private readonly string connectionString;
         private readonly string name;
 
+        /// <summary>
+        /// Set up the database connection
+        /// </summary>
+        /// <param name="connectionStringName">Connection string name</param>
         public DbConnectionFactory(string connectionStringName)
         {
             if (connectionStringName == null) throw new ArgumentNullException("Connection string name");
@@ -24,6 +31,10 @@ namespace ECY.DataAccess
             connectionString = conStr.ConnectionString;
         }
 
+        /// <summary>
+        /// Create a new database connection
+        /// </summary>
+        /// <returns></returns>
         public IDbConnection Create()
         {
             var connection = provider.CreateConnection();

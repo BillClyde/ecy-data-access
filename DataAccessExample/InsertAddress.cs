@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
+using System.Data;
 using ECY.DataAccess.Interfaces;
 
 namespace DataAccessExample
@@ -14,23 +16,37 @@ namespace DataAccessExample
 
         public object Execute(ISession session)
         {
+            object output = null;
             Dictionary<string, object> dict = new Dictionary<string, object> {
                 { "Address1" , _address.Address1 },
                 { "Address2" , _address.Address2 },
                 { "City" , _address.City },
                 { "State" , _address.State },
-                { "PostalCode" , _address.PostalCode }
+                { "PostalCode" , _address.PostalCode },
+                { "Id", ParameterDirection.Output }
             };
-            return session.Execute("spInsertAddress", parseInputParams: cmd =>
+            session.Execute("spInsertAddress", execute: cmd => {
+                cmd.ExecuteNonQuery();
+                output = ((IDbDataParameter)cmd.Parameters["@Id"]).Value;
+            }, parseInputParams: cmd =>
             {
                 foreach(var kvp in dict)
                 {
                     var p = cmd.CreateParameter();
                     p.ParameterName = "@" + kvp.Key;
-                    p.Value = kvp.Value ?? DBNull.Value;
+                    if(kvp.Value != null && kvp.Value.GetType() == typeof(ParameterDirection) && (ParameterDirection)kvp.Value == ParameterDirection.Output)
+                    {
+                        p.Direction = ParameterDirection.Output;
+                        p.DbType = DbType.Int32;
+                    }
+                    else
+                    {
+                        p.Value = kvp.Value ?? DBNull.Value;
+                    }
                     cmd.Parameters.Add(p);
                 }
             });
+            return output;
         }
     }
 }

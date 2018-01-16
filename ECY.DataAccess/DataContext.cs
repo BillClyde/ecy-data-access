@@ -8,6 +8,9 @@ using Common.Logging;
 
 namespace ECY.DataAccess
 {
+    /// <summary>
+    /// Data Context for queries
+    /// </summary>
     public class DataContext : IDisposable
     {
         private readonly ILog log = LogManager.GetLogger<DataContext>();
@@ -15,11 +18,21 @@ namespace ECY.DataAccess
         private readonly DbConnectionFactory _connectionFactory;
         private readonly ReaderWriterLockSlim _rwLock = new ReaderWriterLockSlim();
         private readonly LinkedList<UnitOfWork> _workItems = new LinkedList<UnitOfWork>();
+
+        /// <summary>
+        /// Constructor for setting up the database connection
+        /// </summary>
+        /// <param name="connectionStringName">Name of the connection string</param>
         public DataContext(string connectionStringName)
         {
             _connectionFactory = new DbConnectionFactory(connectionStringName);
         }
 
+        /// <summary>
+        /// Unit of work initialization
+        /// </summary>
+        /// <param name="isolationLevel"></param>
+        /// <returns></returns>
         public UnitOfWork CreateUnitOfWork(IsolationLevel isolationLevel = IsolationLevel.ReadCommitted)
         {
             CreateOrReuseConnection();
@@ -54,12 +67,31 @@ namespace ECY.DataAccess
             }
         }
 
+        /// <summary>
+        /// Strongly typed Query
+        /// </summary>
+        /// <typeparam name="T">Model for query return</typeparam>
+        /// <param name="sp">Stored Procedure for the query, optionally can be sql script</param>
+        /// <param name="param">Object of parameters</param>
+        /// <param name="commandType">Type of command (Stored Proc or SQL Script)</param>
+        /// <param name="parseInputParams">Optional callback for parsing parameters</param>
+        /// <param name="timeout">Query timeout</param>
+        /// <returns>IEnumerable of query results</returns>
         public IEnumerable<T> Query<T>(string sp, object param, CommandType commandType, Action<IDbCommand> parseInputParams = null, int timeout = 15) where T : class, IEntity<T>, new()
         {
             DataTable table = Query(sp, param, commandType, parseInputParams, timeout);
             return new T().Mapper(table);
         }
 
+        /// <summary>
+        /// Dynamically typed Query
+        /// </summary>
+        /// <param name="sp">Stored Procedure for the query, optionally can be sql script</param>
+        /// <param name="param">Object of parameters</param>
+        /// <param name="commandType">Type of command (Stored Proc or SQL Script)</param>
+        /// <param name="parseInputParams">Optional callback for parsing parameters</param>
+        /// <param name="timeout">Query timeout</param>
+        /// <returns>Datatable with query results</returns>
         public DataTable Query(string sp, object param, CommandType commandType, Action<IDbCommand> parseInputParams = null, int timeout = 15)
         {
             DataTable table;
@@ -100,6 +132,14 @@ namespace ECY.DataAccess
             }
         }
 
+        /// <summary>
+        /// Execute stored proc using ExecuteScalar 
+        /// </summary>
+        /// <param name="sp">Stored Procedure for the query, optionally can be sql script</param>
+        /// <param name="param">Object of parameters</param>
+        /// <param name="parseInputParams">Optional callback for parsing parameters</param>
+        /// <param name="timeout">Query timeout</param>
+        /// <returns></returns>
         public object Execute(string sp, object param, Action<IDbCommand> parseInputParams = null, int timeout = 15) 
         {
             CreateOrReuseConnection();
@@ -126,6 +166,49 @@ namespace ECY.DataAccess
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Transaction = GetCurrentTransaction();
                     return cmd.ExecuteScalar();
+                }
+
+            }
+            finally
+            {
+                if (wasClosed) _connection.Close();
+            }
+        }
+
+        /// <summary>
+        /// Execute stored procudure using callback
+        /// </summary>
+        /// <param name="sp">The stored procedure to execute</param>
+        /// <param name="execute">Command execution callback</param>
+        /// <param name="param">Object containing parameters</param>
+        /// <param name="parseInputParams">Optional parameter parsing callback</param>
+        /// <param name="timeout">Optional query timeout</param>
+        public void Execute(string sp, Action<IDbCommand> execute, object param, Action<IDbCommand> parseInputParams = null, int timeout = 15)
+        {
+            CreateOrReuseConnection();
+            bool wasClosed = _connection.State == ConnectionState.Closed;
+            if (wasClosed)
+            {
+                log.DebugFormat("Opening db connection which is {0}", _connection.State == ConnectionState.Closed ? "Closed" : "Open");
+                _connection.Open();
+            }
+            try
+            {
+                using (IDbCommand cmd = _connection.CreateCommand())
+                {
+                    cmd.CommandText = sp;
+                    cmd.CommandTimeout = timeout;
+                    if(parseInputParams == null)
+                    {
+                        AddInputParameters(cmd, param);
+                    }
+                    else
+                    {
+                        parseInputParams(cmd);
+                    }
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Transaction = GetCurrentTransaction();
+                    execute(cmd);
                 }
 
             }
@@ -196,6 +279,9 @@ namespace ECY.DataAccess
             return currentTransaction;
         }
 
+        /// <summary>
+        /// Disose of context cleaning up any unit of work objects.
+        /// </summary>
         public void Dispose()
         {
             log.Debug("Data context being disposed");
